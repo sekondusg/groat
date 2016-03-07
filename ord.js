@@ -96,7 +96,7 @@ function processBlinds( args ) {
 	}
     }
 
-    function blindDown() {
+    function blindsDown() {
 	console.log('blindsDown(): lowering blinds');
 	blindsState = 'down'
 	return {state: { reported: { blinds: 'down' }}}
@@ -137,6 +137,9 @@ function processBlinds( args ) {
 	setTimeout( function() {
 	    genericOperation('update', {state: { desired: { blinds: 'down' }}});
 	}, 10000);
+	setTimeout( function() {
+	    genericOperation('update', {state: { desired: { blinds: 'up' }}});
+	}, 15000);
     }
 
     function deviceConnect() {
@@ -186,10 +189,17 @@ function processBlinds( args ) {
 
     function handleDelta( thingName, stateObject ) {
 	if (args.testMode === 2) {
-	    console.log('unexpected delta in device mode: ' + thingName );
+	    console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
+	    nextState = stateObject.state.blinds;
+	    if (nextState == 'down') {
+		blindsDown();
+	    } else {
+		blindsUp();
+	    }
+	    genericOperation( 'update', blindsGetState() );
 	}
 	else {
-	    console.log( 'delta on: '+thingName+JSON.stringify(stateObject) );
+	    console.log( 'handleDelta() web-app: '+thingName+JSON.stringify(stateObject) );
 	}
     }
 
