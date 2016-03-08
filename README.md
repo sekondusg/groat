@@ -39,7 +39,9 @@ Log
 ===
 
 ### 2016.03.08
- * Developing algorithym to select the Somfy channel. The trick is to get into a known state. Will probably count edges on the LED indicators which flash when changing channels. There are more than a few GPIO pins left on the Raspberry Pi.
+ * Developing algorithym to select the Somfy channel. The trick is to get into a known state. Will probably count edges on the LED indicators which flash when changing channels.
+ * Another idea is to simply power-cycle the Somfy remote to get back into a known state. Assuming the remote will startup quickly and be in a known state (channel 1) -- need to experiment with this to see if feasible. -- Would need to control power to the remote via a PMOS FET, this will have its own voltage drop through Rds_on and the Somfy operating current -- need to calculate this and be sure the Somfy Vdd requirements are met.
+ * There are more than a few GPIO pins left on the Raspberry Pi.
  
 ### 2016.03.07
  * Creation date. The basic flow via MQTT topics with AWS IoT is working.
