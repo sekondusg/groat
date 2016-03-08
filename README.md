@@ -1,8 +1,53 @@
 # groat
-Distributed feedback control for HA using AWS IoT
 
+Welcome to Groat, a small coin in the realm of IoT.
+
+Introduction
+============
+
+Connected Home Automation devices are more and more common and available with a wide variety of features. For example the Amazon Echo is available to do voice activation of lights. The Samsung Smartthings Hub can tie together Lighting control and cameras. Each HA platform integrates well with a subset of the automatable products in the market. There are gaps though, the integration of many products are either non-existant or very expensive. There is also little support for custom hardware interfaces.
+
+Purpose
+=======
+Grout bridges the gap between custom hardware based HA controllers and the Cloud of accessable interfaces.
+
+
+Design
+======
+
+Grout uses distributed feedback control for HA via the AWS IoT platform. The AWS IoT platform is accessable via REST interfaces through AWS Lambda.
+
+
+Deployment
+==========
 Launch web-app agent with:
 node ord.js -F config.js -f $HOME/certs -g us-west-2 -t 1
 
 Launch device agent with:
 node ord.js -F config.js -f $HOME/certs -g us-west-2 -t 2
+
+Troubleshooting Steps
+=====================
+
+Issues
+======
+
+Resources
+=========
+
+Log
+===
+
+### 2016.03.08
+ * Developing algorithym to select the Somfy channel. The trick is to get into a known state. Will probably count edges on the LED indicators which flash when changing channels. There are more than a few GPIO pins left on the Raspberry Pi.
+ 
+### 2016.03.07
+ * Creation date. The basic flow via MQTT topics with AWS IoT is working.
+ * Wiring the Somfy remote to a Raspberry Pi is testing successfully. Only staight interconnects were required (no pull-up, or buffering needed)
+ * Using Node.js "onoff" library to interface with Raspberry Pi hardware
+ * Ran-into a permissions problem for the GPIO device files. The 'pi' account is a member of the gpio group, but the gpio group write permission does not have full access to the OS dev nodes for GPIO ports. Manually chmod'd/chgrp'd as a work-around.
+ * Should add a permissions setting project 'bootstrap' script to the project.
+ * Followed [the Adafruit Node.js Embedded Dev on Raspberry Pi](https://learn.adafruit.com/node-embedded-development/events) to learn about the "onoff" library
+
+
+
