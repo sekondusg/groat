@@ -21,10 +21,10 @@ Grout uses distributed feedback control for HA via the AWS IoT platform. The AWS
 Deployment
 ==========
 Launch web-app agent with:
-node ord.js -F config.js -f $HOME/certs -g us-west-2 -t 1
+node groat.js -F config.js -f $HOME/certs -g us-west-2 -t 1
 
 Launch device agent with:
-node ord.js -F config.js -f $HOME/certs -g us-west-2 -t 2
+node groat.js -F config.js -f $HOME/certs -g us-west-2 -t 2
 
 Troubleshooting Steps
 =====================
