@@ -39,35 +39,50 @@ var lower = function() {
 var raise = function() {
 }
 
-export.allRaise = function() {
+exports.allRaise = function() {
     switchChanTo(allBlindsChan);
     raise();
 }
 
-export.allLower = function() {
+exports.allLower = function() {
     switchChanTo(allBlindsChan);
     lower();
 }
 
-export.doorRaise = function() {
+exports.doorRaise = function() {
     switchChanTo(doorChan);
     raise();
 }
 
-export.doorLower = function() {
+exports.doorLower = function() {
     switchChanTo(doorChan);
     lower();
 }
 
-export.livingRoomRaise = function() {
+exports.livingRoomRaise = function() {
     switchChanTo(livingRoomChan);
     raise();
 }
 
-export.livingRoomdoorLower = function() {
+exports.livingRoomdoorLower = function() {
     switchChanTo(livingRoomChan);
     lower();
 }
 
+function pulse(gpio, cb) {
+    //Set gpio.gpioPin output, low;
+    console.log("pulse(): setting gpio: " + gpio.gpioPin + " to low");
+    setTimeout(function() {
+	// Set gpio.gpioPin input;
+	console.log("pulse(): setting gpio: " + gpio.gpioPin + " to high-Z");
+	setTimeout(cb, gpio.duration);
+    }, gpio.duration);
+}
 
+function test() {
+    pulse({gpioPin: 4, duration: 500}, function() {
+	console.log("test(): finished pulsing");
+    });
+}
 
+test()
