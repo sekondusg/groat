@@ -72,15 +72,21 @@ exports.livingRoomdoorLower = function() {
 function pulse(gpio, cb) {
     //Set gpio.gpioPin output, low;
     console.log("pulse(): setting gpio: " + gpio.gpioPin + " to low");
-    setTimeout(function() {
+    var err;
+
+    //setTimeout(setHighZ(err), gpio.duration);
+    setTimeout(setHighZ(err), 10000);
+
+    function setHighZ(err) {
+	if (err) { return cb(err); }
 	// Set gpio.gpioPin input;
 	console.log("pulse(): setting gpio: " + gpio.gpioPin + " to high-Z");
 	setTimeout(cb, gpio.duration);
-    }, gpio.duration);
+    }
 }
 
 function test() {
-    pulse({gpioPin: 4, duration: 500}, function() {
+    pulse({gpioPin: 4, duration: 1000}, function() {
 	console.log("test(): finished pulsing");
     });
 }
