@@ -1,14 +1,13 @@
-
 // Control pins
 
-const upPin = 4;
-const downPin = 5;
-const channelPin = 6;
+const upPin = 5;
+const downPin = 6;
+const channelPin = 4;
 
 // Indicator pins
 
-const chan1Pin = 7;
-const chan2Pin = 8;
+const chan1Pin = 17;
+const chan2Pin = 27;
 
 
 // Counters for number of flashes on LEDs
@@ -28,6 +27,10 @@ const allBlindsChan = 4;
 const chanDisplayTimeout = 6000;
 const chanDetectPeriod = 1000;
 const chanPulseDuration = 100;
+
+// GPIO ports
+var GPIO = require('onoff').Gpio
+var chanGPIO = new GPIO(channelPin,'in');
 
 var isChannel1 = function() {
 }
@@ -78,6 +81,8 @@ exports.livingRoomdoorLower = function() {
 function pulse(gpio, next) {
     //Set gpio.gpioPin output, low;
     console.log("pulse(): setting gpio: " + gpio.gpioPin + " to low");
+    chanGPIO.setDirection('out');
+    chanGPIO.write(0); 
     var err; // = "oops";
 
     //setTimeout(setHighZ(err), gpio.duration);
@@ -88,6 +93,7 @@ function pulse(gpio, next) {
 	if (err) { return next(err); }
 	
 	console.log("pulse(): setting gpio: " + gpio.gpioPin + " to high-Z");
+    	chanGPIO.setDirection('in');
 	setTimeout(next, gpio.duration, err);
     }
 }
@@ -102,24 +108,24 @@ function blindsActivate(desired, next) {
 	}
     }
     function chanTwoActive(desired, err) {
-	pulse({gpioPin: channelpin, chanPulseDuration}, function activate() {
-	};)
+	pulse({gpioPin: channelpin, duration: chanPulseDuration}, function activate() {
+	});
     }
 
     function switchChannel(chanDiff, correctChannel) {
 	if (chanDiff == 0) { return correctChannel(); }
-	pulse({gpioPin: channelpin, chanPulseDuration}, function {
+	pulse({gpioPin: channelpin, duration: chanPulseDuration}, function() {
 	    switchChannel(chanDiff - 1, correctChannel);
 	});
     }
 }
 
-function findChanelFive(next) {
+function findChannelFive(next) {
     var chOneCnt = 0, chTwoCnt = 0;
     // Set edge count callbacks
 
     // Pulse channel select
-    pulse( {gpioPin: chanPin, duration: chanPulseDuration}, function detPause() {
+    pulse( {gpioPin: channelPin, duration: chanPulseDuration}, function detPause() {
 	setTimeout(detectCh5, chanDetectPeriod);
     });
     // and wait for flashes
@@ -136,12 +142,15 @@ function findChanelFive(next) {
 }
 
 function test() {
-    pulse({gpioPin: 4, duration: 1000}, function(err) {
+    pulse({gpioPin: channelPin, duration: chanPulseDuration}, function(err) {
 	if (err) {
 	    console.log("test(): pulse produced error: " + err);
 	} else {
 	    console.log("test(): finished pulsing");
 	}
+    });
+    findChannelFive( function(){
+	console.log("findChannel5(): scanning");
     });
 }
 
