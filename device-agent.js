@@ -1,23 +1,5 @@
-/*
- * Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
-//node.js deps
-
-//npm deps
-
 //app deps
+
 const thingShadow = require('aws-iot-device-sdk').thingShadow;
 const cmdLineProcess   = require('aws-iot-device-sdk/examples/lib/cmdline');
 const somfy = require('./somfy.js');
@@ -57,7 +39,7 @@ function processBlinds( args ) {
 
     var currentTimeout = null;
 
-    var blindsState = 'up'
+    var blindsState = 'raised'
 
 //
 // For convenience, use a stack to keep track of the current client 
@@ -99,18 +81,32 @@ function processBlinds( args ) {
 	}
     }
 
-    function blindsDown() {
-	console.log('blindsDown(): lowering blinds');
+    function allBlindsLower() {
+	console.log('allBlindsLower(): lowering blinds');
 	somfy.allLower();
-	blindsState = 'down'
-	return {state: { reported: { blinds: 'down' }}}
+	blindsState = 'lowered'
+	return {state: { reported: { blinds: 'lowered' }}}
     }
 
-    function blindsUp() {
-	console.log('blindsUp(): raising blinds');
+    function allBlindsRaise() {
+	console.log('allBlindsRaised(): raising blinds');
 	somfy.allRaise();
-	blindsState = 'up'
-	return {state: { reported: { blinds: 'up' }}}
+	blindsState = 'raised'
+	return {state: { reported: { blinds: 'raised' }}}
+    }
+
+    function doorBlindLower() {
+	console.log('doorBlindLower(): lowering door blind');
+	somfy.doorLower();
+	blindsState = 'lowered'
+	return {state: { reported: { blinds: 'lowered' }}}
+    }
+
+    function doorBlindRaise() {
+	console.log('doorBlindsRaised(): raising door blind');
+	somfy.doorRaise();
+	blindsState = 'raised'
+	return {state: { reported: { blinds: 'raised' }}}
     }
 
     function blindsGetState() {
@@ -119,36 +115,8 @@ function processBlinds( args ) {
 	return state
     }
 
-    /*
-    function generateRandomState() {
-	var rgbValues={ red: 0, green: 0, blue: 0 };
-
-	rgbValues.red   = Math.floor(Math.random() * 255);
-	rgbValues.green = Math.floor(Math.random() * 255);
-	rgbValues.blue  = Math.floor(Math.random() * 255);
-
-	return {state: { desired: rgbValues }};
-    }
-    */
-
-    function mobileAppConnect() {
-	thingShadows.register( thingName, { ignoreDeltas: false,
-					    operationTimeout: operationTimeout } );
-	console.log('mobileAppConnect(): registring thingName: '+thingName);
-	//thingShadows.register(thingName);
-	setTimeout( function() {
-	    genericOperation('get');
-	}, 5000);
-	setTimeout( function() {
-	    genericOperation('update', {state: { desired: { blinds: 'down' }}});
-	}, 10000);
-	setTimeout( function() {
-	    genericOperation('update', {state: { desired: { blinds: 'up' }}});
-	}, 15000);
-    }
-
     function deviceConnect() {
-	//thingShadows.register( thingName, { 
+	console.log("deviceConnect(): registering and updating device side of " + thingName);
 	thingShadows.register( thingName, { ignoreDeltas: false,
 						    operationTimeout: operationTimeout } );
 	setTimeout( function() {
@@ -157,11 +125,7 @@ function processBlinds( args ) {
     }
 
     function handleConnections() {
-	if (args.testMode === 1) {
-	    mobileAppConnect();
-	} else {
-	    deviceConnect();
-	}
+	deviceConnect();
     }
 
     function handleStatus( thingName, stat, clientToken, stateObject ) {
@@ -170,42 +134,32 @@ function processBlinds( args ) {
 
 	if (expectedClientToken === clientToken) {
 	    console.log( 'got \''+stat+'\' status on: '+thingName+', state: '+JSON.stringify(stateObject));
-	}
-	else {
+	} else {
 	    console.log('(status) client token mismtach on: '+thingName);
 	}
 
-	if (args.testMode === 2) {
-	    console.log('updated state to thing shadow');
-	    //
-	    // If no other operation is pending, restart it after 10 seconds.
-	    //
-	    if (currentTimeout === null) {
-		currentTimeout = setTimeout( function() {
-		    currentTimeout = null;
-		    genericOperation( 'update', blindsGetState());
-		}, 10000 );
-	    }
-	} else if (args.testMode === 1) {
-	    console.log('client status');
-	} 
-	
+
+	console.log('updated state to thing shadow');
+	//
+	// If no other operation is pending, restart it after 10 seconds.
+	//
+	if (currentTimeout === null) {
+	    currentTimeout = setTimeout( function() {
+		currentTimeout = null;
+		genericOperation( 'update', blindsGetState());
+	    }, 10000 );
+	}
     }
 
     function handleDelta( thingName, stateObject ) {
-	if (args.testMode === 2) {
-	    console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
-	    nextState = stateObject.state.blinds;
-	    if (nextState == 'down') {
-		blindsDown();
-	    } else {
-		blindsUp();
-	    }
-	    genericOperation( 'update', blindsGetState() );
+	console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
+	nextState = stateObject.state.blinds;
+	if (nextState == 'lowered') {
+	    doorBlindLower();
+	} else {
+	    doorBlindRaise();
 	}
-	else {
-	    console.log( 'handleDelta() web-app: '+thingName+JSON.stringify(stateObject) );
-	}
+	genericOperation( 'update', blindsGetState() );
     }
 
     function handleTimeout( thingName, clientToken ) {
@@ -219,11 +173,12 @@ function processBlinds( args ) {
 	    console.log('(timeout) client token mismtach on: '+thingName);
 	}
 
-	if (args.testMode === 2) {
-	    genericOperation( 'update', blindsGetState());
-	}
+	genericOperation( 'update', blindsGetState());
     }
 
+
+    // Events
+    
     thingShadows.on('connect', function() {
 	console.log('connected to things instance, registering thing name');
 	handleConnections();
@@ -280,6 +235,6 @@ function processBlinds( args ) {
 module.exports = cmdLineProcess;
 
 if (require.main === module) {
-  cmdLineProcess('connect to the AWS IoT service and demonstrate thing shadow APIs, test modes 1-2',
+  cmdLineProcess('connect to the AWS IoT service and activate this IoT device',
                  process.argv.slice(2), processBlinds );
 }
