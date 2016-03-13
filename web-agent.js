@@ -1,28 +1,6 @@
-/*
- * Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
-//node.js deps
-
-//npm deps
-
 //app deps
 const thingShadow = require('aws-iot-device-sdk').thingShadow;
 const cmdLineProcess   = require('aws-iot-device-sdk/examples/lib/cmdline');
-const somfy = require('./somfy.js');
-
-
 
 //begin module
 
@@ -166,7 +144,7 @@ function processBlinds( args ) {
 
     function handleStatus( thingName, stat, clientToken, stateObject ) {
 	var expectedClientToken = stack.pop();
-	console.log('handleStatus(): stat: '+stat+', stateObject: '+ JSON.stringify(stateObject));
+	console.log('handleStatus(): stat: '+stat+', stateObject: '+JSON.stringify(stateObject));
 
 	if (expectedClientToken === clientToken) {
 	    console.log( 'got \''+stat+'\' status on: '+thingName+', state: '+JSON.stringify(stateObject));

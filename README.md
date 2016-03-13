@@ -40,6 +40,7 @@ Log
 
 ### 2016.03.12
  * Somfy hardware integration is testing correctly. Interface is using continuation passing style throughout.
+ * Tests are working with full integration through AWS IoT and Somfy device intergration
 
 ### 2016.03.08
  * Developing algorithm to select the Somfy channel. The trick is to get into a known state. Will probably count edges on the LED indicators which flash when changing channels.
