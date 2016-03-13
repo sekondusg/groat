@@ -101,12 +101,14 @@ function processBlinds( args ) {
 
     function blindsDown() {
 	console.log('blindsDown(): lowering blinds');
+	somfy.allLower();
 	blindsState = 'down'
 	return {state: { reported: { blinds: 'down' }}}
     }
 
     function blindsUp() {
 	console.log('blindsUp(): raising blinds');
+	somfy.allRaise();
 	blindsState = 'up'
 	return {state: { reported: { blinds: 'up' }}}
     }

@@ -25,7 +25,7 @@ const allBlindsChan = 4;
 // Time Durations
 
 const chanDisplayTimeout = 6000;
-const chanDetectPeriod = 1000;
+const chanDetectPeriod = 300;
 const chanPulseDuration = 100;
 
 // GPIO ports
@@ -105,6 +105,7 @@ function findChannelFive(err, channel, next) {
 
     // Check if in channel 5
     function detectCh5(){
+	console.log("detectCh5() count: " + ch1FlashCount);
 	if (ch1FlashCount > 1 && ch2FlashCount > 1) {
 	    next(err, channel);
 	} else {
