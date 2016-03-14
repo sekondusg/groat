@@ -24,7 +24,8 @@ Launch web-app agent with:
 node groat.js -F config.js -f $HOME/certs -g us-west-2 -t 1
 
 Launch device agent with:
-node groat.js -F config.js -f $HOME/certs -g us-west-2 -t 2
+
+device-agent start
 
 Troubleshooting Steps
 =====================

@@ -2,7 +2,7 @@
 
 start(){
 	echo "starting device-agent"
-	nohup node device-agent.js -F config.js -f $HOME/certs -g us-west-2 > $HOME/groat/device-agent.log 2>&1 &
+	nohup node device-agent.js -F etc/config.js -f $HOME/certs -g us-west-2 > $HOME/groat/device-agent.log 2>&1 &
 }
 
 status(){
