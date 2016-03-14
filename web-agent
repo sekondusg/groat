@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "starting web-agent"
+node web-agent.js -F etc/config.js -f $HOME/certs -g us-west-2

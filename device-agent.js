@@ -39,7 +39,8 @@ function processBlinds( args ) {
 
     var currentTimeout = null;
 
-    var blindsState = 'raised'
+    //var blindsState = 'raised'
+    var blindsState = {allBlinds: 'raised', doorBlind: 'raised', livingroomBlind: 'raised'};
 
 //
 // For convenience, use a stack to keep track of the current client 
@@ -84,33 +85,51 @@ function processBlinds( args ) {
     function allBlindsLower() {
 	console.log('allBlindsLower(): lowering blinds');
 	somfy.allLower();
-	blindsState = 'lowered'
-	return {state: { reported: { blinds: 'lowered' }}}
+	blindsState.allBlinds = 'lowered'
+	blindsState.doorBlind = 'lowered'
+	blindsState.livingroomBlind = 'lowered'
+	return {state: {reported: blindsState}}
     }
 
     function allBlindsRaise() {
 	console.log('allBlindsRaised(): raising blinds');
 	somfy.allRaise();
-	blindsState = 'raised'
-	return {state: { reported: { blinds: 'raised' }}}
+	blindsState.allBlinds = 'raised'
+	blindsState.doorBlind = 'raised'
+	blindsState.livingroomBlind = 'raised'
+	return {state: { reported: blindsState}}
     }
 
     function doorBlindLower() {
 	console.log('doorBlindLower(): lowering door blind');
 	somfy.doorLower();
-	blindsState = 'lowered'
-	return {state: { reported: { blinds: 'lowered' }}}
+	blindsState.doorBlind = 'lowered'
+	return {state: { reported: blindsState}}
     }
 
     function doorBlindRaise() {
 	console.log('doorBlindsRaised(): raising door blind');
 	somfy.doorRaise();
-	blindsState = 'raised'
-	return {state: { reported: { blinds: 'raised' }}}
+	blindsState.doorBlind = 'raised'
+	return {state: { reported: blindsState}}
+    }
+
+    function livingroomBlindLower() {
+	console.log('livingroomBlindLower(): lowering livingroom blind');
+	somfy.livingroomLower();
+	blindsState.livingroomBlind = 'lowered'
+	return {state: { reported: blindsState}}
+    }
+
+    function livingroomBlindRaise() {
+	console.log('livingroomBlindsRaised(): raising livingroom blind');
+	somfy.livingroomRaise();
+	blindsState.livingroomBlind = 'raised'
+	return {state: { reported: blindsState}}
     }
 
     function blindsGetState() {
-	var state = {state: { reported: { blinds: blindsState }}};
+	var state = {state: { reported: blindsState }};
 	console.log('blindsGetState(): fetching blinds current state: ' + JSON.stringify(state));
 	return state
     }
@@ -153,12 +172,25 @@ function processBlinds( args ) {
 
     function handleDelta( thingName, stateObject ) {
 	console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
-	nextState = stateObject.state.blinds;
-	if (nextState == 'lowered') {
+	nextState = stateObject.state;
+	if (nextState.door == 'lowered') {
 	    doorBlindLower();
-	} else {
+	} else if (nextState.door == 'raised') {
 	    doorBlindRaise();
 	}
+
+	if (nextState.all == 'lowered') {
+	    allBlindsLower();
+	} else if (nextState.all == 'raised') {
+	    allBlindsRaise();
+	}
+	    
+	if (nextState.livingroom == 'lowered') {
+	    livingroomBlindLower();
+	} else if (nextState.livingroom == 'raised') {
+	    livingroomBlindRaise();
+	}
+	    
 	genericOperation( 'update', blindsGetState() );
     }
 

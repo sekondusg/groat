@@ -64,12 +64,12 @@ exports.doorLower = function() {
     doBlinds(err, {desired: doorBlindChan, current: null}, 'lower');
 }
 
-exports.livingRoomRaise = function() {
+exports.livingroomRaise = function() {
     var err;
     doBlinds(err, {desired: livingRoomBlindChan, current: null}, 'raise');
 }
 
-exports.livingRoomdoorLower = function() {
+exports.livingroomdoorLower = function() {
     var err;
     doBlinds(err, {desired: livingRoomBlindChan, current: null}, 'lower');
 }
@@ -153,14 +153,18 @@ function selectChannel(channel, next, err, args) {
 
 
 function doBlinds(err, channel, action) {
+    if (err) { return report(err); }
+    
     selectChannel(channel, activateBlinds, err, action);
 
     function activateBlinds(err, action) {
 	if (err) { return next(err, args); }
 	if (action == 'raise') {
-	    //pulse({gpioPin: upPin, duration: chanPulseDuration}, next, err, args);
+	    console.log("doBlinds(): raising blinds on channel: " + channel);
+	    pulse({gpioPin: upPin, duration: chanPulseDuration}, next, err, args);
 	} else if (action == 'lower') {
-	    //pulse({gpioPin: downPin, duration: chanPulseDuration}, next, err, args);
+	    console.log("doBlinds(): raising blinds on channel: " + channel);
+	    pulse({gpioPin: downPin, duration: chanPulseDuration}, next, err, args);
 	} else {
 	    err = "activateBlinds(): unknown action: " + action;
 	}
@@ -174,7 +178,7 @@ function doBlinds(err, channel, action) {
 }
 
 function test() {
-    exports.allRaise();
+    exports.doorRaise();
     setTimeout(exports.doorLower, 6000);
     
     /*
