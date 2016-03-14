@@ -1,0 +1,30 @@
+#!/bin/bash
+
+start(){
+	echo "starting device-agent"
+	nohup node device-agent.js -F config.js -f $HOME/certs -g us-west-2 > $HOME/groat/device-agent.log 2>&1 &
+}
+
+status(){
+	pgrep -f device-agent.js > /dev/null
+	if [ $? -eq 0 ]; then
+		echo device-agent is running
+	else
+		echo device-agent is not running
+	fi
+}
+
+stop(){
+	echo "stopping device-agent"
+	pkill -f device-agent.js
+}
+
+if [ "$1" == "start" ]; then
+	start
+elif [ "$1" == "stop" ]; then
+	stop
+elif [ "$1" == "status" ]; then
+	status
+else
+	echo "usage: $1 start|stop|status"
+fi
