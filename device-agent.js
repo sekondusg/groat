@@ -173,22 +173,28 @@ function processBlinds( args ) {
     function handleDelta( thingName, stateObject ) {
 	console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
 	nextState = stateObject.state;
-	if (nextState.door == 'lowered') {
+	if (nextState.doorBlind == 'lowered') {
 	    doorBlindLower();
-	} else if (nextState.door == 'raised') {
+	    console.log('handleDelta() lowering doorBlind');
+	} else if (nextState.doorBlind == 'raised') {
 	    doorBlindRaise();
+	    console.log('handleDelta() raising doorBlind');
 	}
 
-	if (nextState.all == 'lowered') {
+	if (nextState.allBlinds == 'lowered') {
 	    allBlindsLower();
-	} else if (nextState.all == 'raised') {
+	    console.log('handleDelta() raising allBlinds');
+	} else if (nextState.allBlinds == 'raised') {
 	    allBlindsRaise();
+	    console.log('handleDelta() raising allBlinds');
 	}
 	    
-	if (nextState.livingroom == 'lowered') {
+	if (nextState.livingroomBlind == 'lowered') {
 	    livingroomBlindLower();
-	} else if (nextState.livingroom == 'raised') {
+	    console.log('handleDelta() lowering livingroomBlind');
+	} else if (nextState.livingroomBlind == 'raised') {
 	    livingroomBlindRaise();
+	    console.log('handleDelta() raising livingroomBlind');
 	}
 	    
 	genericOperation( 'update', blindsGetState() );

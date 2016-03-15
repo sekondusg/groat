@@ -1,22 +1,35 @@
 #!/bin/bash
 
+RET_VAL=0
+source /home/pi/.bashrc
+PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 start(){
-	echo "starting device-agent"
-	nohup node device-agent.js -F etc/config.js -f $HOME/certs -g us-west-2 > $HOME/groat/device-agent.log 2>&1 &
+	status
+	if [ "$RET_VAL" == "1" ]; then
+		echo "starting device-agent"
+		cd $HOME/groat
+		nohup node device-agent.js -F etc/config.js -f $HOME/certs -g us-west-2 > $HOME/groat/device-agent.log 2>&1 &
+	else
+		echo "device-agent was already running"
+	fi
 }
 
 status(){
 	pgrep -f device-agent.js > /dev/null
 	if [ $? -eq 0 ]; then
 		echo device-agent is running
+		RET_VAL=0
 	else
 		echo device-agent is not running
+		RET_VAL=1
 	fi
 }
 
 stop(){
 	echo "stopping device-agent"
 	pkill -f device-agent.js
+	RET_VAL=1
 }
 
 if [ "$1" == "start" ]; then

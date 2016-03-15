@@ -161,10 +161,10 @@ function doBlinds(err, channel, action) {
 	if (err) { return next(err, args); }
 	if (action == 'raise') {
 	    console.log("doBlinds(): raising blinds on channel: " + channel);
-	    pulse({gpioPin: upPin, duration: chanPulseDuration}, next, err, args);
+	    pulse({gpioPin: upPin, duration: chanPulseDuration}, report, err);
 	} else if (action == 'lower') {
 	    console.log("doBlinds(): raising blinds on channel: " + channel);
-	    pulse({gpioPin: downPin, duration: chanPulseDuration}, next, err, args);
+	    pulse({gpioPin: downPin, duration: chanPulseDuration}, report, err);
 	} else {
 	    err = "activateBlinds(): unknown action: " + action;
 	}
