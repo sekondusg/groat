@@ -2,7 +2,7 @@
 
 const thingShadow = require('aws-iot-device-sdk').thingShadow;
 const cmdLineProcess   = require('aws-iot-device-sdk/examples/lib/cmdline');
-const somfy = require('./somfy.js');
+const somfy = require('./somfy-null.js');
 
 
 
@@ -69,7 +69,7 @@ function processBlinds( args ) {
 // interval which is greater than the thing shadow operation timeout.
 //
 	    if (currentTimeout !== null) {
-		console.log('operation in progress, scheduling retry...');
+		console.log('genericOperation() operation in progress, scheduling retry...');
 		currentTimeout = setTimeout( 
 		    function() { genericOperation( operation, state ); }, 
                     operationTimeout * 2 );
@@ -108,7 +108,7 @@ function processBlinds( args ) {
     }
 
     function doorBlindRaise() {
-	console.log('doorBlindsRaised(): raising door blind');
+	console.log('doorBlindRaised(): raising door blind');
 	somfy.doorRaise();
 	blindsState.doorBlind = 'raised'
 	return {state: { reported: blindsState}}
@@ -152,22 +152,25 @@ function processBlinds( args ) {
 	console.log('handleStatus(): stat: '+stat+', stateObject: '+ JSON.stringify(stateObject));
 
 	if (expectedClientToken === clientToken) {
-	    console.log( 'got \''+stat+'\' status on: '+thingName+', state: '+JSON.stringify(stateObject));
+	    console.log( 'handleStatus() got \''+stat+'\' status on: '+thingName+', state: '+JSON.stringify(stateObject));
 	} else {
-	    console.log('(status) client token mismtach on: '+thingName);
+	    console.log('handleStatus() client token mismtach on: '+thingName);
 	}
 
 
-	console.log('updated state to thing shadow');
+	console.log('handleStatus() updated state to thing shadow');
 	//
 	// If no other operation is pending, restart it after 10 seconds.
 	//
+	/*
 	if (currentTimeout === null) {
 	    currentTimeout = setTimeout( function() {
+		console.log('handleStatus() updating current state status');
 		currentTimeout = null;
 		genericOperation( 'update', blindsGetState());
 	    }, 10000 );
 	}
+	*/
     }
 
     function handleDelta( thingName, stateObject ) {
@@ -208,7 +211,7 @@ function processBlinds( args ) {
 	    console.log('timeout on: '+thingName);
 	} 
 	else {
-	    console.log('(timeout) client token mismtach on: '+thingName);
+	    console.log('handleTimeout() client token mismtach on: '+thingName);
 	}
 
 	genericOperation( 'update', blindsGetState());
@@ -218,17 +221,17 @@ function processBlinds( args ) {
     // Events
     
     thingShadows.on('connect', function() {
-	console.log('connected to things instance, registering thing name');
+	console.log('connect() connected to things instance, registering thing name');
 	handleConnections();
     });
 
     thingShadows.on('close', function() {
-	console.log('close');
+	console.log('clonse(): hook called: close');
 	thingShadows.unregister( thingName );
     });
 
     thingShadows.on('reconnect', function() {
-	console.log('reconnect');
+	console.log('reconnect(): hook called: reconnect');
 	handleConnections();
     });
 
@@ -246,26 +249,29 @@ function processBlinds( args ) {
 	while (stack.length) {
 	    stack.pop();
 	}
-	console.log('offline');
+	console.log('offline(): hook called: offline');
     });
 
     thingShadows.on('error', function(error) {
-	console.log('error', error);
+	console.log('error(): hook called: ', error);
     });
 
     thingShadows.on('message', function(topic, payload) {
-	console.log('message', topic, payload.toString());
+	console.log('message(): hook called: ', topic, payload.toString());
     });
 
     thingShadows.on('status', function(thingName, stat, clientToken, stateObject) {
+	console.log('status(): hook called: ', thingName);
 	handleStatus( thingName, stat, clientToken, stateObject );
     });
 
     thingShadows.on('delta', function(thingName, stateObject) {
+	console.log('delta() hook called: ', thingName);
 	handleDelta( thingName, stateObject );
     });
 
     thingShadows.on('timeout', function(thingName, clientToken) {
+	console.log('timeout(): called: ', thingName);
 	handleTimeout( thingName, clientToken );
     });
 }

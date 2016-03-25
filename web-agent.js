@@ -77,13 +77,6 @@ function processBlinds( args ) {
 	}
     }
 
-
-    function blindsGetState() {
-	var state = {state: { reported: { blinds: blindsState }}};
-	console.log('blindsGetState(): fetching blinds current state: ' + JSON.stringify(state));
-	return state
-    }
-
     function mobileAppConnect() {
 	thingShadows.register( thingName, { ignoreDeltas: false,
 					    operationTimeout: operationTimeout } );
@@ -92,10 +85,10 @@ function processBlinds( args ) {
 	    genericOperation('get');
 	}, 5000);
 	setTimeout( function() {
-	    genericOperation('update', {state: { desired: { blinds: 'lowered' }}});
+	    genericOperation('update', {state: { desired: { doorBlind: 'lowered' }}});
 	}, 10000);
 	setTimeout( function() {
-	    genericOperation('update', {state: { desired: { blinds: 'raised' }}});
+	    genericOperation('update', {state: { desired: { doorBlind: 'raised' }}});
 	}, 15000);
     }
 
