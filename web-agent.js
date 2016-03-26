@@ -89,7 +89,7 @@ function processBlinds( args ) {
 	}, 10000);
 	setTimeout( function() {
 	    genericOperation('update', {state: { desired: { doorBlind: 'raised' }}});
-	}, 15000);
+	}, 30000);
     }
 
     function handleConnections() {

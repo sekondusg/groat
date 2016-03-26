@@ -160,10 +160,10 @@ function doBlinds(err, channel, action) {
     function activateBlinds(err, action) {
 	if (err) { return next(err, args); }
 	if (action == 'raise') {
-	    console.log("doBlinds(): raising blinds on channel: " + channel);
+	    console.log("doBlinds(): raising blinds on channel: " + JSON.strigify(channel));
 	    pulse({gpioPin: upPin, duration: chanPulseDuration}, report, err);
 	} else if (action == 'lower') {
-	    console.log("doBlinds(): raising blinds on channel: " + channel);
+	    console.log("doBlinds(): lowering blinds on channel: " + JSON.stringify(channel));
 	    pulse({gpioPin: downPin, duration: chanPulseDuration}, report, err);
 	} else {
 	    err = "activateBlinds(): unknown action: " + action;
@@ -178,8 +178,8 @@ function doBlinds(err, channel, action) {
 }
 
 function test() {
-    exports.doorRaise();
-    setTimeout(exports.doorLower, 6000);
+    doorLower();
+    setTimeout(exports.doorRaise, 6000);
     
     /*
     pulse({gpioPin: channelPin, duration: chanPulseDuration}, function(err) {
