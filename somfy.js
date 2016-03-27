@@ -33,6 +33,8 @@ var GPIO = require('onoff').Gpio
 var chanGPIO = new GPIO(channelPin,'in');
 var ch1LEDGPIO = new GPIO(chan1Pin,'in','falling');
 var ch2LEDGPIO = new GPIO(chan2Pin,'in','falling');
+var upGPIO = new GPIO(upPin,'in');
+var downGPIO = new GPIO(downPin,'in');
 
 var isChannel1 = function() {
 }
@@ -46,51 +48,61 @@ var switchChanTo = function(channel) {
 
 exports.allRaise = function() {
     var err;
-    doBlinds(err, {desired: allBlindsChan, current: null}, 'raise');
+    doBlinds(err, {desired: allBlindsChan, reported: null}, 'raise');
 }
 
 exports.allLower = function() {
     var err;
-    doBlinds(err, {desired: allBlindsChan, current: null}, 'lower');
+    doBlinds(err, {desired: allBlindsChan, reported: null}, 'lower');
 }
 
 exports.doorRaise = function() {
     var err;
-    doBlinds(err, {desired: doorBlindChan, current: null}, 'raise');
+    doBlinds(err, {desired: doorBlindChan, reported: null}, 'raise');
 }
 
 exports.doorLower = function() {
     var err;
-    doBlinds(err, {desired: doorBlindChan, current: null}, 'lower');
+    doBlinds(err, {desired: doorBlindChan, reported: null}, 'lower');
 }
 
 exports.livingroomRaise = function() {
     var err;
-    doBlinds(err, {desired: livingRoomBlindChan, current: null}, 'raise');
+    doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'raise');
 }
 
 exports.livingroomdoorLower = function() {
     var err;
-    doBlinds(err, {desired: livingRoomBlindChan, current: null}, 'lower');
+    doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'lower');
 }
 
-function pulse(gpio, next, err, args) {
+function pulse(gpioSel, next, err, args) {
+    console.log("pulse(): gpioSel: " + JSON.stringify(gpioSel));
+    var gpio;
+    if (gpioSel.gpioPin == channelPin) {
+	gpio = chanGPIO;
+    } else if (gpioSel.gpioPin == upPin) {
+	gpio = upGPIO;
+    } else if (gpioSel.gpioPin == downPin) {
+	gpio = downGPIO;
+    }
+
     //Set gpio.gpioPin output, low;
-    //console.log("pulse(): setting gpio: " + gpio.gpioPin + " to low");
-    chanGPIO.setDirection('out');
-    chanGPIO.write(0); 
+    //console.log("pulse(): setting gpio: " + gpioSel.gpioPin + " to low");
+    gpio.setDirection('out');
+    gpio.write(0); 
     var err; // = "oops";
 
     //setTimeout(setHighZ(err), gpio.duration);
-    setTimeout(setHighZ, gpio.duration, err, gpio);
+    setTimeout(setHighZ, gpioSel.duration, err, gpioSel);
 
-    function setHighZ(err, gpio) {
+    function setHighZ(err, gpioSel) {
 	// Set gpio.gpioPin input;
 	if (err) { return next(err); }
 	
-	//console.log("pulse(): setting gpio: " + gpio.gpioPin + " to high-Z");
-    	chanGPIO.setDirection('in');
-	setTimeout(next, gpio.duration, err, args);
+	//console.log("pulse(): setting gpio: " + gpioSel.gpioPin + " to high-Z");
+    	gpio.setDirection('in');
+	setTimeout(next, gpioSel.duration, err, args);
     }
 }
 
@@ -128,7 +140,7 @@ function countLED2Flash(err, val) {
 
 
 function selectChannel(channel, next, err, args) {
-    channel.current = 0;
+    channel.reported = 0;
 
     ch1LEDGPIO.watch(countLED1Flash);
     ch2LEDGPIO.watch(countLED2Flash);
@@ -137,15 +149,15 @@ function selectChannel(channel, next, err, args) {
 
     function advanceChannel(err, channel) {
 	if (err) { return next(err, channel); }
-	if (channel.current == channel.desired) { return cleanup(err, channel); }
-	channel.current = channel.current + 1;
+	if (channel.reported == channel.desired) { return cleanup(err, channel); }
+	channel.reported = channel.reported + 1;
 	pulse({gpioPin: channelPin, duration: chanPulseDuration}, advanceChannel, err, channel);
     }
 
     function cleanup(err, channel) {
 	if (err) { next(err, channel); }
-	ch1LEDGPIO.watch(countLED1Flash);
-	ch2LEDGPIO.watch(countLED2Flash);
+	ch1LEDGPIO.unwatch(countLED1Flash);
+	ch2LEDGPIO.unwatch(countLED2Flash);
 	console.log("cleanup()");
 	return next(err, args);
     }
@@ -153,16 +165,18 @@ function selectChannel(channel, next, err, args) {
 
 
 function doBlinds(err, channel, action) {
+    console.log('doBlinds(): channel: ' + JSON.stringify(channel) + ', action: ' + action);
     if (err) { return report(err); }
     
     selectChannel(channel, activateBlinds, err, action);
+    
 
     function activateBlinds(err, action) {
 	if (err) { return next(err, args); }
-	if (action == 'raise') {
-	    console.log("doBlinds(): raising blinds on channel: " + JSON.strigify(channel));
+	if (action === 'raise') {
+	    console.log("doBlinds(): raising blinds on channel: " + channel);
 	    pulse({gpioPin: upPin, duration: chanPulseDuration}, report, err);
-	} else if (action == 'lower') {
+	} else if (action === 'lower') {
 	    console.log("doBlinds(): lowering blinds on channel: " + JSON.stringify(channel));
 	    pulse({gpioPin: downPin, duration: chanPulseDuration}, report, err);
 	} else {
@@ -173,13 +187,16 @@ function doBlinds(err, channel, action) {
 
     function report(err) {
 	if (err) { return console.log("ERROR: " + err); }
-	console.log("doBlinds(): action: " + action + ", channel: " + JSON.stringify(channel));
+	console.log("doBlinds:report(): action: " + action + ", channel: " + JSON.stringify(channel));
     }
 }
 
 function test() {
-    doorLower();
-    setTimeout(exports.doorRaise, 6000);
+    exports.doorLower();
+    //exports.doorRaise();
+    setTimeout(exports.doorRaise, 30000);
+    //setTimeout(process.exit, 15000);
+    //testSelectChannel();
     
     /*
     pulse({gpioPin: channelPin, duration: chanPulseDuration}, function(err) {
@@ -190,6 +207,20 @@ function test() {
 	}
     }, err);
     */
+}
+
+function testSelectChannel() {
+    var err;
+    var channel = {desired: doorBlindChan, reported: null};
+    selectChannel(channel, function(){
+	console.log('testSelectChannel(): channel: ' + JSON.stringify(channel));
+    	channel = {desired: 1, reported: null};
+	setTimeout(function(){
+	    selectChannel(channel, function(){
+	        console.log('testSelectChannel(): channel: ' + JSON.stringify(channel));
+            }, err);
+	}, 5000);
+    },err);
 }
 
 test()

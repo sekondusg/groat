@@ -2,7 +2,7 @@
 
 const thingShadow = require('aws-iot-device-sdk').thingShadow;
 const cmdLineProcess   = require('aws-iot-device-sdk/examples/lib/cmdline');
-const somfy = require('./somfy-null.js');
+const somfy = require('./somfy.js');
 
 
 
