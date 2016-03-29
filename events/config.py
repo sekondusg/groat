@@ -6,7 +6,7 @@ class Config:
         # For calculating magetic declination: http://www.ngdc.noaa.gov/geomag-web/#declination
         # Used the returned URL from Google maps for determining latitude and longitude
         self.home = {
-            'solar_azimuth': 179, # Units in degrees measured from South and going clockwise
+            'solar_azimuth': 179, # Units in degrees measured from North going East
             'lat': 45.5205163,
             'lon': -122.7482624
         }
