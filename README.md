@@ -27,6 +27,32 @@ Launch device agent with:
 
 device-agent start
 
+Deployment in AWS-EC2
+=====================
+Create an EC2 instance. Have used t2.micro with AMI: Amazon Linux AMI 2016.03.0 (HVM), SSD Volume Type
+Install depedencies
+ * sudo yum install git
+ * sudo yum install python
+ * sudo yum install python-virtualenv
+ * sudo yum groupinstall "Development Tools"
+Clone Groat 
+ * git clone git@github.com:sekondus/groat.git
+Setup Python
+ * cd groat
+ * virtualenv venv
+ * . profile
+Setup Node
+ * mkdir .nave
+ * cd .nave
+ * wget http://github.com/isaacs/nave/raw/master/nave.sh
+ * chmod +x nave.sh
+ * sudo ln -s $PWD/nave.sh /usr/local/bin/nave
+ * sudo mkdir -p /usr/local/{share/man,bin,lib/node,lib/node_modules,include/node}
+ * sudo chown -R /usr/local/{share/man,bin,lib/node,lib/node_modules,include/node}
+ * nave usemain stable
+ * curl https://www.npmjs.com/install.sh | sh
+
+
 Troubleshooting Steps
 =====================
 

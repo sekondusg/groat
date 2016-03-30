@@ -1,4 +1,4 @@
-#!/bin/eval python
+#!/usr/bin/env python
 
 from config import config
 import ephem
@@ -38,7 +38,7 @@ class Solar:
         home = config.home
         obs.lat = str(home['lat'])
         obs.lon = str(home['lon'])
-        obs.date = datetime.utcnow().strftime("%Y/%m/%d 00:00:00")
+        obs.date = datetime.utcnow().strftime("%Y/%m/%d 09:00:00")
         dt = datetime.strptime(str(obs.next_setting(ephem.Sun())), '%Y/%m/%d %H:%M:%S') 
         return dt
 
