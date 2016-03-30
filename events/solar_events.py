@@ -38,7 +38,7 @@ class Solar:
         home = config.home
         obs.lat = str(home['lat'])
         obs.lon = str(home['lon'])
-        obs.date = datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
+        obs.date = datetime.utcnow().strftime("%Y/%m/%d 00:00:00")
         dt = datetime.strptime(str(obs.next_setting(ephem.Sun())), '%Y/%m/%d %H:%M:%S') 
         return dt
 
@@ -57,6 +57,7 @@ class Solar:
         now = datetime.utcnow()
         az_dt = sol.time_of_solar_azimuth_today(sol.home['solar_azimuth'])
         sunset = sol.time_of_sunset_today()
+        print 'now:', str(now), 'sunset:', str(sunset), 'az_dt:', az_dt
         if now < sunset and now > az_dt:
             conditions = sol.get_current_weather()
             print "Sun could be shining on the windows, conditions:", str(conditions)
