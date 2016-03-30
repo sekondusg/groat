@@ -1,6 +1,7 @@
 //app deps
 const thingShadow = require('aws-iot-device-sdk').thingShadow;
 const cmdLineProcess   = require('aws-iot-device-sdk/examples/lib/cmdline');
+const spawn = require('child_process').spawn;
 
 //begin module
 
@@ -84,14 +85,39 @@ function processBlinds( args ) {
 	setTimeout( function() {
 	    genericOperation('get');
 	}, 5000);
+	setInterval(checkWeather, 150000); // Check the weather every 2.5 minutes and close binds if sunny
+	/*
 	setTimeout( function() {
 	    genericOperation('update', {state: { desired: { doorBlind: 'lowered' }}});
 	}, 10000);
 	setTimeout( function() {
 	    genericOperation('update', {state: { desired: { doorBlind: 'raised' }}});
 	}, 30000);
+	*/
     }
 
+    function checkWeather() {
+	const weather = spawn('solar_events.py');
+	weather.stdout.on('data', (data) => {
+	    console.log(`stdout: ${data}`);
+	});
+	weather.stderr.on('data', (data) => {
+	    console.log(`stderr: ${data}`);
+	});
+	weather.on('close', (code) => {
+	    console.log(`child process exited with code: ${code}`);
+	    if (code == '0') {
+		console.log('closing the blinds');
+		genericOperation('update', {state: { desired: { allBlinds: 'lowered' }}});
+	    } else if (code == '1') {
+		console.log('opening the blinds');
+		genericOperation('update', {state: { desired: { allBlinds: 'raised' }}});
+	    } else {
+		console.log('dont know what to do with the blinds');
+	    }
+	});
+    }
+    
     function handleConnections() {
 	mobileAppConnect();
     }
