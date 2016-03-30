@@ -58,11 +58,11 @@ class Solar:
         az_dt = sol.time_of_solar_azimuth_today(sol.home['solar_azimuth'])
         sunset = sol.time_of_sunset_today()
         if now < sunset and now > az_dt:
-            print "Sun could be shining on the windows"
             conditions = sol.get_current_weather()
-            if conditions['solar_radiation'] > 300.0:
+            print "Sun could be shining on the windows, conditions:", str(conditions)
+            if float(conditions['solar_radiation']) > 300.0:
                 print "It is sunny"
-                if conditions['temp'] > 15.0:
+                if float(conditions['temp']) > 15.0:
                     print "It is warm"
                     return True
         else:
