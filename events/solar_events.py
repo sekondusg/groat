@@ -1,4 +1,4 @@
-#!/home/dennis/groat/venv/bin/python
+#!/bin/eval python
 
 from config import config
 import ephem
