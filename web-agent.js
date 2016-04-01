@@ -97,7 +97,7 @@ function processBlinds( args ) {
     }
 
     function checkWeather() {
-	const weather = spawn('solar_events.py');
+	const weather = spawn('events/solar_events.py');
 	weather.stdout.on('data', (data) => {
 	    console.log(`stdout: ${data}`);
 	});
