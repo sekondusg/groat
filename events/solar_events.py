@@ -68,25 +68,25 @@ class Solar:
         alt = float(sun.alt)
         alt = alt if alt > 0.01 else 0.01
         intensity = float(solar_radiation) / math.sin(alt)
-        print 'alt:', str(alt), ',rad:', solar_radiation, ',intensity:', str(intensity)
+        print 'solar_events(): alt:', str(alt), ',rad:', solar_radiation, ',intensity:', str(intensity)
         return({'intensity': intensity, 'temp': temp})
 
     def is_warm_n_sunny(self):
         now = datetime.utcnow()
         az_dt = self.time_of_solar_azimuth_today(sol.home['solar_azimuth'])
         sunset = self.time_of_sunset_today()
-        print 'now:', str(now), 'sunset:', str(sunset), 'az_dt:', az_dt
+        print 'solar_events(): now:', str(now), 'sunset:', str(sunset), 'az_dt:', az_dt
         if now < sunset and now > az_dt:
             conditions = self.get_solar_intensity()
             #conditions = sol.get_current_weather()
-            print "Sun could be shining on the windows, conditions:", str(conditions)
+            print "solar_events() Sun could be shining on the windows, conditions:", str(conditions)
             if float(conditions['intensity']) > 600.0:
-                print "It is sunny"
+                print "solar_events(): it is sunny"
                 if float(conditions['temp']) > 15.0:
-                    print "It is warm"
+                    print "solar_events() it is warm and sunny"
                     return True
         else:
-            print "Sun is not shining through windows"
+            print "solar_events() Sun is not shining through windows"
         return False
         
         

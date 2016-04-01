@@ -99,21 +99,21 @@ function processBlinds( args ) {
     function checkWeather() {
 	const weather = spawn('solar_events.py');
 	weather.stdout.on('data', (data) => {
-	    console.log(`stdout: ${data}`);
+	    console.log(`checkWeather(): success: ${data}`);
 	});
 	weather.stderr.on('data', (data) => {
-	    console.log(`stderr: ${data}`);
+	    console.log(`checkWeather(): error: ${data}`);
 	});
 	weather.on('close', (code) => {
 	    console.log(`child process exited with code: ${code}`);
 	    if (code == '0') {
-		console.log('closing the blinds');
+		console.log('checkWeather(): closing the blinds');
 		genericOperation('update', {state: { desired: { allBlinds: 'lowered' }}});
 	    } else if (code == '1') {
-		console.log('opening the blinds');
+		console.log('checkWeather(): opening the blinds');
 		genericOperation('update', {state: { desired: { allBlinds: 'raised' }}});
 	    } else {
-		console.log('dont know what to do with the blinds');
+		console.log('checkWeather(): dont know what to do with the blinds');
 	    }
 	});
     }
@@ -127,13 +127,11 @@ function processBlinds( args ) {
 	console.log('handleStatus(): stat: '+stat+', stateObject: '+JSON.stringify(stateObject));
 
 	if (expectedClientToken === clientToken) {
-	    console.log( 'got \''+stat+'\' status on: '+thingName+', state: '+JSON.stringify(stateObject));
+	    console.log('handleStatus(): match on client token: ' + clientToken);
 	}
 	else {
-	    console.log('(status) client token mismtach on: '+thingName);
+	    console.log('handleStatus(): mismatch on client token: ' + clientToken);
 	}
-
-	console.log('client status');
     }
 
     function handleDelta( thingName, stateObject ) {
