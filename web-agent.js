@@ -27,6 +27,8 @@ function processBlinds( args ) {
 	debug: args.Debug
     });
 
+    var state = {sunny: true};
+
 //
 // Operation timeout in milliseconds
 //
@@ -97,7 +99,7 @@ function processBlinds( args ) {
     }
 
     function checkWeather() {
-	const weather = spawn('solar_events.py');
+	const weather = spawn('events/solar_events.py');
 	weather.stdout.on('data', (data) => {
 	    console.log(`checkWeather(): success: ${data}`);
 	});
@@ -107,11 +109,17 @@ function processBlinds( args ) {
 	weather.on('close', (code) => {
 	    console.log(`child process exited with code: ${code}`);
 	    if (code == '0') {
-		console.log('checkWeather(): closing the blinds');
-		genericOperation('update', {state: { desired: { allBlinds: 'lowered' }}});
+		if (state.sunny == false) {
+		    console.log('checkWeather(): closing the blinds');
+		    genericOperation('update', {state: { desired: { allBlinds: 'lowered' }}});
+		    state.sunny = true;
+		}
 	    } else if (code == '1') {
-		console.log('checkWeather(): opening the blinds');
-		genericOperation('update', {state: { desired: { allBlinds: 'raised' }}});
+		if (state.sunny == true) {
+		    console.log('checkWeather(): opening the blinds');
+		    genericOperation('update', {state: { desired: { allBlinds: 'raised' }}});
+		    state.sunny = false;
+		}
 	    } else {
 		console.log('checkWeather(): dont know what to do with the blinds');
 	    }
