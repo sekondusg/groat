@@ -1,4 +1,46 @@
 #!/bin/bash
 
+
+RET_VAL=0
+source /home/pi/.bashrc
+PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+start(){
+	status
+	if [ "$RET_VAL" == "1" ]; then
+		echo "starting web-agent"
+		cd $HOME/groat
+		nohup node web-agent.js -F etc/config.js -f $HOME/certs -g us-west-2 > $HOME/groat/web-agent.log 2>&1 &
+	else
+		echo "web-agent was already running"
+	fi
+}
+
+status(){
+	pgrep -f web-agent.js > /dev/null
+	if [ $? -eq 0 ]; then
+		echo web-agent is running
+		RET_VAL=0
+	else
+		echo web-agent is not running
+		RET_VAL=1
+	fi
+}
+
+stop(){
+	echo "stopping web-agent"
+	pkill -f web-agent.js
+	RET_VAL=1
+}
+
+if [ "$1" == "start" ]; then
+	start
+elif [ "$1" == "stop" ]; then
+	stop
+elif [ "$1" == "status" ]; then
+	status
+else
+	echo "usage: $1 start|stop|status"
+fi
+
 echo "starting web-agent"
-node web-agent.js -F etc/config.js -f $HOME/certs -g us-west-2
