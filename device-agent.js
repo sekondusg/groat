@@ -176,7 +176,7 @@ function processBlinds( args ) {
     function handleDelta( thingName, stateObject ) {
 	console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
 	//nextState = stateObject.state;
-	for (var nextState = stateObject.state) {
+	for (var nextState in stateObject.state) {
 	    if (nextState == 'doorBlind') {
 		if (stateObject.state[nextState] == 'lowered') {
 		    doorBlindLower();
