@@ -175,31 +175,42 @@ function processBlinds( args ) {
 
     function handleDelta( thingName, stateObject ) {
 	console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
-	nextState = stateObject.state;
-	if (nextState.doorBlind == 'lowered') {
-	    doorBlindLower();
-	    console.log('handleDelta() lowering doorBlind');
-	} else if (nextState.doorBlind == 'raised') {
-	    doorBlindRaise();
-	    console.log('handleDelta() raising doorBlind');
+	//nextState = stateObject.state;
+	for (var nextState = stateObject.state) {
+	    if (nextState == 'doorBlind') {
+		if (stateObject.state[nextState] == 'lowered') {
+		    doorBlindLower();
+		    console.log('handleDelta() lowering doorBlind');
+		} else if (stateObject.state[nextState] == 'raised') {
+		    doorBlindRaise();
+		    console.log('handleDelta() raising doorBlind');
+		} else {
+		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
+		}
+	    } else if (nextState == 'livingroomBlind') {
+		if (stateObject.state[nextState] == 'lowered') {
+		    livingroomBlindLower();
+		    console.log('handleDelta() lowering livingroomBlind');
+		} else if (stateObject.state[nextState] == 'raised') {
+		    livingroomBlindRaise();
+		    console.log('handleDelta() raising livingroomBlind');
+		} else {
+		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
+		}
+	    } else if (nextState == 'allBlinds') {
+		if (stateObject.state[nextState] == 'lowered') {
+		    allBlindsLower();
+		    console.log('handleDelta() lowering allBlinds');
+		} else if (stateObject.state[nextState] == 'raised') {
+		    allBlindsRaise();
+		    console.log('handleDelta() raising allBlinds');
+		} else {
+		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
+		}
+	    } else {
+		console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
+	    }
 	}
-
-	if (nextState.allBlinds == 'lowered') {
-	    allBlindsLower();
-	    console.log('handleDelta() raising allBlinds');
-	} else if (nextState.allBlinds == 'raised') {
-	    allBlindsRaise();
-	    console.log('handleDelta() raising allBlinds');
-	}
-	    
-	if (nextState.livingroomBlind == 'lowered') {
-	    livingroomBlindLower();
-	    console.log('handleDelta() lowering livingroomBlind');
-	} else if (nextState.livingroomBlind == 'raised') {
-	    livingroomBlindRaise();
-	    console.log('handleDelta() raising livingroomBlind');
-	}
-	    
 	genericOperation( 'update', blindsGetState() );
     }
 
