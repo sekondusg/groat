@@ -82,49 +82,49 @@ function processBlinds( args ) {
 	}
     }
 
-    function allBlindsLower() {
+    function allBlindsLower(err, next) {
 	console.log('allBlindsLower(): lowering blinds');
-	somfy.allLower();
 	blindsState.allBlinds = 'lowered'
 	blindsState.doorBlind = 'lowered'
 	blindsState.livingroomBlind = 'lowered'
+	somfy.allLower(err, next);
 	return {state: {reported: blindsState}}
     }
 
-    function allBlindsRaise() {
+    function allBlindsRaise(err, next) {
 	console.log('allBlindsRaised(): raising blinds');
-	somfy.allRaise();
 	blindsState.allBlinds = 'raised'
 	blindsState.doorBlind = 'raised'
 	blindsState.livingroomBlind = 'raised'
+	somfy.allRaise(err, next);
 	return {state: { reported: blindsState}}
     }
 
-    function doorBlindLower() {
+    function doorBlindLower(err, next) {
 	console.log('doorBlindLower(): lowering door blind');
-	somfy.doorLower();
 	blindsState.doorBlind = 'lowered'
+	somfy.doorLower(err, next);
 	return {state: { reported: blindsState}}
     }
 
-    function doorBlindRaise() {
+    function doorBlindRaise(err, next) {
 	console.log('doorBlindRaised(): raising door blind');
-	somfy.doorRaise();
 	blindsState.doorBlind = 'raised'
+	somfy.doorRaise(err, next);
 	return {state: { reported: blindsState}}
     }
 
-    function livingroomBlindLower() {
+    function livingroomBlindLower(err, next) {
 	console.log('livingroomBlindLower(): lowering livingroom blind');
-	somfy.livingroomLower();
 	blindsState.livingroomBlind = 'lowered'
+	somfy.livingroomLower(err, next);
 	return {state: { reported: blindsState}}
     }
 
-    function livingroomBlindRaise() {
+    function livingroomBlindRaise(err, next) {
 	console.log('livingroomBlindsRaised(): raising livingroom blind');
-	somfy.livingroomRaise();
 	blindsState.livingroomBlind = 'raised'
+	somfy.livingroomRaise(err, next);
 	return {state: { reported: blindsState}}
     }
 
@@ -175,35 +175,38 @@ function processBlinds( args ) {
 
     function handleDelta( thingName, stateObject ) {
 	console.log( 'handleDelta() device: '+thingName+JSON.stringify(stateObject) );
-	//nextState = stateObject.state;
+	// Each activity needs to happen serially, not asynchronously due to the
+	// single Somfy transmitter requirements
+
+	var head = function(err, next) { genericOperation('update', blindsGetState()); };
 	for (var nextState in stateObject.state) {
 	    if (nextState == 'doorBlind') {
 		if (stateObject.state[nextState] == 'lowered') {
-		    doorBlindLower();
 		    console.log('handleDelta() lowering doorBlind');
+		    head = function(err, next) { doorBlindLower(err, head); };
 		} else if (stateObject.state[nextState] == 'raised') {
-		    doorBlindRaise();
 		    console.log('handleDelta() raising doorBlind');
+		    head = function(err, next) { doorBlindRaise(err, head); };
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
 	    } else if (nextState == 'livingroomBlind') {
 		if (stateObject.state[nextState] == 'lowered') {
-		    livingroomBlindLower();
 		    console.log('handleDelta() lowering livingroomBlind');
+		    head = function(err, next) { livingroomBlindLower(err, head); };
 		} else if (stateObject.state[nextState] == 'raised') {
-		    livingroomBlindRaise();
 		    console.log('handleDelta() raising livingroomBlind');
+		    head = function(err, next) { livingroomBlindRaise(err, head); };
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
 	    } else if (nextState == 'allBlinds') {
 		if (stateObject.state[nextState] == 'lowered') {
-		    allBlindsLower();
 		    console.log('handleDelta() lowering allBlinds');
+		    head = function(err, next) { allBlindsLower(err, head); };
 		} else if (stateObject.state[nextState] == 'raised') {
-		    allBlindsRaise();
 		    console.log('handleDelta() raising allBlinds');
+		    head = function(err, next) { allBlindsRaise(err, head); };
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
@@ -211,8 +214,9 @@ function processBlinds( args ) {
 		console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 	    }
 	}
-	genericOperation( 'update', blindsGetState() );
+	head("", null); // Call the chain of delta event handlers
     }
+
 
     function handleTimeout( thingName, clientToken ) {
 	var expectedClientToken = stack.pop();

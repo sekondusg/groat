@@ -46,34 +46,28 @@ var switchChanTo = function(channel) {
 
 }
 
-exports.allRaise = function() {
-    var err;
-    doBlinds(err, {desired: allBlindsChan, reported: null}, 'raise');
+exports.allRaise = function(err, next) {
+    doBlinds(err, {desired: allBlindsChan, reported: null}, 'raise', next);
 }
 
-exports.allLower = function() {
-    var err;
-    doBlinds(err, {desired: allBlindsChan, reported: null}, 'lower');
+exports.allLower = function(err, next) {
+    doBlinds(err, {desired: allBlindsChan, reported: null}, 'lower', next);
 }
 
-exports.doorRaise = function() {
-    var err;
-    doBlinds(err, {desired: doorBlindChan, reported: null}, 'raise');
+exports.doorRaise = function(err, next) {
+    doBlinds(err, {desired: doorBlindChan, reported: null}, 'raise', next);
 }
 
-exports.doorLower = function() {
-    var err;
-    doBlinds(err, {desired: doorBlindChan, reported: null}, 'lower');
+exports.doorLower = function(err, next) {
+    doBlinds(err, {desired: doorBlindChan, reported: null}, 'lower', next);
 }
 
-exports.livingroomRaise = function() {
-    var err;
-    doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'raise');
+exports.livingroomRaise = function(err, next) {
+    doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'raise', next);
 }
 
-exports.livingroomdoorLower = function() {
-    var err;
-    doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'lower');
+exports.livingroomdoorLower = function(err, next) {
+    doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'lower', next);
 }
 
 function pulse(gpioSel, next, err, args) {
@@ -164,7 +158,7 @@ function selectChannel(channel, next, err, args) {
 }
 
 
-function doBlinds(err, channel, action) {
+function doBlinds(err, channel, action, next) {
     console.log('doBlinds(): channel: ' + JSON.stringify(channel) + ', action: ' + action);
     if (err) { return report(err); }
     
@@ -188,6 +182,7 @@ function doBlinds(err, channel, action) {
     function report(err) {
 	if (err) { return console.log("ERROR: " + err); }
 	console.log("doBlinds:report(): action: " + action + ", channel: " + JSON.stringify(channel));
+	next();
     }
 }
 
