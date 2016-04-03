@@ -2,7 +2,7 @@
 
 
 RET_VAL=0
-source /home/pi/.bashrc
+source $HOME/groat/profile
 PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 start(){
@@ -42,5 +42,3 @@ elif [ "$1" == "status" ]; then
 else
 	echo "usage: $1 start|stop|status"
 fi
-
-echo "starting web-agent"
