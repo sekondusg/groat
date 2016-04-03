@@ -179,7 +179,7 @@ function doBlinds(err, channel, action, next) {
 	report(err);
     }
 
-    function report(err) {
+    function report(err, next) {
 	if (err) { return console.log("ERROR: " + err); }
 	console.log("doBlinds:report(): action: " + action + ", channel: " + JSON.stringify(channel));
 	next();
