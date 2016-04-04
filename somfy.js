@@ -55,10 +55,12 @@ exports.allLower = function(err, next) {
 }
 
 exports.doorRaise = function(err, next) {
+    console.log("doorRaise(): next: " + next);
     doBlinds(err, {desired: doorBlindChan, reported: null}, 'raise', next);
 }
 
 exports.doorLower = function(err, next) {
+    console.log("doorLower(): next: " + next);
     doBlinds(err, {desired: doorBlindChan, reported: null}, 'lower', next);
 }
 
