@@ -111,7 +111,7 @@ function processBlinds( args ) {
     }
 
     function allBlindsRaise(err, next) {
-	console.log('allBlindsRaised(): raising blinds');
+	console.log('allBlindsRaise(): raising blinds');
 	blindsState.allBlinds = 'raised'
 	blindsState.doorBlind = 'raised'
 	blindsState.livingroomBlind = 'raised'
@@ -120,14 +120,14 @@ function processBlinds( args ) {
     }
 
     function doorBlindLower(err, next) {
-	console.log('doorBlindLower(): lowering door blind');
+	console.log('doorBlindLower(): lowering door blind, next: ' + next);
 	blindsState.doorBlind = 'lowered'
 	somfy.doorLower(err, next);
 	return {state: { reported: blindsState}}
     }
 
     function doorBlindRaise(err, next) {
-	console.log('doorBlindRaised(): raising door blind');
+	console.log('doorBlindRaise(): raising door blind, next: ' + next);
 	blindsState.doorBlind = 'raised'
 	somfy.doorRaise(err, next);
 	return {state: { reported: blindsState}}
@@ -141,7 +141,7 @@ function processBlinds( args ) {
     }
 
     function livingroomBlindRaise(err, next) {
-	console.log('livingroomBlindsRaised(): raising livingroom blind');
+	console.log('livingroomBlindsRaise(): raising livingroom blind');
 	blindsState.livingroomBlind = 'raised'
 	somfy.livingroomRaise(err, next);
 	return {state: { reported: blindsState}}
