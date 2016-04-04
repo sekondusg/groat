@@ -4,6 +4,25 @@ const thingShadow = require('aws-iot-device-sdk').thingShadow;
 const cmdLineProcess   = require('aws-iot-device-sdk/examples/lib/cmdline');
 const somfy = require('./somfy.js');
 
+// Helper library to manage call-back chaining
+var CallChain = function() {
+    var stack = [];
+    this.add = function(call) {
+	stack.push(call);
+    };
+    this.execute = function(err) {
+	var wrap = function(call, callback) {
+	    return function() {
+		call(err, callback);
+	    };
+	};
+	for (var i = stack.length - 1; i > -1; i--){
+	    next = i < stack.length -1 ? stack[i + 1] : null;
+	    stack[i] = wrap(stack[i], next);
+	}
+	stack[0]();
+    };
+}
 
 
 //begin module
@@ -178,35 +197,36 @@ function processBlinds( args ) {
 	// Each activity needs to happen serially, not asynchronously due to the
 	// single Somfy transmitter requirements
 
-	var head = function(err, next) { genericOperation('update', blindsGetState()); };
+	var chain = new CallChain();
+
 	for (var nextState in stateObject.state) {
 	    if (nextState == 'doorBlind') {
 		if (stateObject.state[nextState] == 'lowered') {
 		    console.log('handleDelta() lowering doorBlind');
-		    head = function(err, next) { doorBlindLower(err, head); };
+		    chain.add(function(err, next) { doorBlindLower(err, head); });
 		} else if (stateObject.state[nextState] == 'raised') {
 		    console.log('handleDelta() raising doorBlind');
-		    head = function(err, next) { doorBlindRaise(err, head); };
+		    chain.add(function(err, next) { doorBlindRaise(err, head); });
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
 	    } else if (nextState == 'livingroomBlind') {
 		if (stateObject.state[nextState] == 'lowered') {
 		    console.log('handleDelta() lowering livingroomBlind');
-		    head = function(err, next) { livingroomBlindLower(err, head); };
+		    chain.add(function(err, next) { livingroomBlindLower(err, head); });
 		} else if (stateObject.state[nextState] == 'raised') {
 		    console.log('handleDelta() raising livingroomBlind');
-		    head = function(err, next) { livingroomBlindRaise(err, head); };
+		    chain.add(function(err, next) { livingroomBlindRaise(err, head); });
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
 	    } else if (nextState == 'allBlinds') {
 		if (stateObject.state[nextState] == 'lowered') {
 		    console.log('handleDelta() lowering allBlinds');
-		    head = function(err, next) { allBlindsLower(err, head); };
+		    chain.add(function(err, next) { allBlindsLower(err, head); });
 		} else if (stateObject.state[nextState] == 'raised') {
 		    console.log('handleDelta() raising allBlinds');
-		    head = function(err, next) { allBlindsRaise(err, head); };
+		    chain.add(function(err, next) { allBlindsRaise(err, head); });
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
@@ -214,7 +234,8 @@ function processBlinds( args ) {
 		console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 	    }
 	}
-	head("", null); // Call the chain of delta event handlers
+	chain.add(function(err, next) { genericOperation('update', blindsGetState()); });
+	chain.execute();
     }
 
 
