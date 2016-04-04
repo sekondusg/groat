@@ -68,7 +68,7 @@ exports.livingroomRaise = function(err, next) {
     doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'raise', next);
 }
 
-exports.livingroomdoorLower = function(err, next) {
+exports.livingroomLower = function(err, next) {
     doBlinds(err, {desired: livingRoomBlindChan, reported: null}, 'lower', next);
 }
 
@@ -189,9 +189,9 @@ function doBlinds(err, channel, action, next) {
 }
 
 function test() {
-    exports.doorLower();
+    //exports.doorLower();
     //exports.doorRaise();
-    setTimeout(exports.doorRaise, 30000);
+    //setTimeout(exports.doorRaise, 30000);
     //setTimeout(process.exit, 15000);
     //testSelectChannel();
     
