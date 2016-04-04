@@ -203,30 +203,30 @@ function processBlinds( args ) {
 	    if (nextState == 'doorBlind') {
 		if (stateObject.state[nextState] == 'lowered') {
 		    console.log('handleDelta() lowering doorBlind');
-		    chain.add(function(err, next) { doorBlindLower(err, head); });
+		    chain.add(function(err, next) { doorBlindLower(err, next); });
 		} else if (stateObject.state[nextState] == 'raised') {
 		    console.log('handleDelta() raising doorBlind');
-		    chain.add(function(err, next) { doorBlindRaise(err, head); });
+		    chain.add(function(err, next) { doorBlindRaise(err, next); });
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
 	    } else if (nextState == 'livingroomBlind') {
 		if (stateObject.state[nextState] == 'lowered') {
 		    console.log('handleDelta() lowering livingroomBlind');
-		    chain.add(function(err, next) { livingroomBlindLower(err, head); });
+		    chain.add(function(err, next) { livingroomBlindLower(err, next); });
 		} else if (stateObject.state[nextState] == 'raised') {
 		    console.log('handleDelta() raising livingroomBlind');
-		    chain.add(function(err, next) { livingroomBlindRaise(err, head); });
+		    chain.add(function(err, next) { livingroomBlindRaise(err, next); });
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
 	    } else if (nextState == 'allBlinds') {
 		if (stateObject.state[nextState] == 'lowered') {
 		    console.log('handleDelta() lowering allBlinds');
-		    chain.add(function(err, next) { allBlindsLower(err, head); });
+		    chain.add(function(err, next) { allBlindsLower(err, next); });
 		} else if (stateObject.state[nextState] == 'raised') {
 		    console.log('handleDelta() raising allBlinds');
-		    chain.add(function(err, next) { allBlindsRaise(err, head); });
+		    chain.add(function(err, next) { allBlindsRaise(err, next); });
 		} else {
 		    console.log('handleDelta() ERROR: unknown state: ' + nextState + ': ' + stateObject.state[nextState]);
 		}
