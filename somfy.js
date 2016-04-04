@@ -219,5 +219,3 @@ function testSelectChannel() {
 	}, 5000);
     },err);
 }
-
-test()
