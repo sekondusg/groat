@@ -159,7 +159,7 @@ function selectChannel(channel, next, err, args) {
 
 
 function doBlinds(err, channel, action, next) {
-    console.log('doBlinds(): channel: ' + JSON.stringify(channel) + ', action: ' + action);
+    console.log('doBlinds(): channel: ' + JSON.stringify(channel) + ', action: ' + action + ', next: ' + next);
     if (err) { return report(err); }
     
     selectChannel(channel, activateBlinds, err, action);
@@ -176,7 +176,7 @@ function doBlinds(err, channel, action, next) {
 	} else {
 	    err = "activateBlinds(): unknown action: " + action;
 	}
-	report(err);
+	report(err, next);
     }
 
     function report(err, next) {
