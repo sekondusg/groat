@@ -82,7 +82,7 @@ class Solar:
             print "solar_events() Sun could be shining on the windows, conditions:", str(conditions)
             if float(conditions['intensity']) > 600.0:
                 print "solar_events(): it is sunny"
-                if float(conditions['temp']) > 15.0:
+                if float(conditions['temp']) > 12.0:
                     print "solar_events() it is warm and sunny"
                     return True
         else:
