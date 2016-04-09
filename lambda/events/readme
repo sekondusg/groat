@@ -1,0 +1,3 @@
+zip -r ../events.zip . -x *~
+
+aws kms encrypt --key-id b268b3d2-26bf-4f2e-949a-422ccc648025 --plaintext file:///home/dennis/groat/lambda/events/certs/cert.pem --query CiphertextBlob --output text | base64 --decode > cert.pem.enc

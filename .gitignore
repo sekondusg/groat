@@ -39,3 +39,5 @@ jspm_packages
 *-
 
 /venv/
+
+*.zip
