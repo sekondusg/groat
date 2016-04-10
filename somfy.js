@@ -178,12 +178,15 @@ function doBlinds(err, channel, action, next) {
 	} else {
 	    err = "activateBlinds(): unknown action: " + action;
 	}
-	report(err, next);
+	report(err);
     }
 
-    function report(err, next) {
-	if (err) { return console.log("ERROR: " + err); }
+    function report(err) {
 	console.log("doBlinds:report(): action: " + action + ", channel: " + JSON.stringify(channel));
+	if (err) {
+	    console.log("ERROR: " + err);
+	    return(next());
+	}
 	next();
     }
 }
