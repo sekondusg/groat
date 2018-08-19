@@ -9,7 +9,8 @@ start(){
 	if [ "$RET_VAL" == "1" ]; then
 		echo "starting device-agent"
 		cd $HOME/groat
-		nohup node device-agent.js -F etc/config.js -f $HOME/certs -g us-west-2 > $HOME/groat/device-agent.log 2>&1 &
+		echo `date` " device-agent starting" >> $HOME/groat/device-agent.log
+		nohup node device-agent.js -F etc/config.js -f $HOME/certs -g us-west-2 >> $HOME/groat/device-agent.log 2>&1 &
 	else
 		echo "device-agent was already running"
 	fi
